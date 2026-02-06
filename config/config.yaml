@@ -1,0 +1,198 @@
+# Platform Engineering KPI Dashboard Configuration
+# This file contains JIRA connection details and project settings
+
+jira:
+  # List of JIRA URLs (supports multiple JIRA instances)
+  urls:
+    - "https://your-company.atlassian.net"
+    # - "https://another-jira-instance.com"  # Add more if needed
+
+  # JIRA API Token (generate from: https://id.atlassian.com/manage-profile/security/api-tokens)
+  # For security, consider using environment variable: JIRA_API_TOKEN
+  token: "YOUR_JIRA_API_TOKEN_HERE"
+
+  # JIRA Email (used with token for authentication)
+  email: "your.email@company.com"
+
+projects:
+  # List of JIRA project keys to track
+  project_keys:
+    - "CCT"
+    - "SCPX"
+    - "CCEN"
+    # Add more project keys as needed
+
+  # Team mapping (optional - helps group projects by team)
+  teams:
+    - name: "Scale and Perf"
+      projects: ["SCPX"]
+    - name: "Compliance"
+      projects: ["CCEN", "CCT"]
+
+# Work Category Labels Configuration (OPTIONAL)
+# Labels are ONLY needed if you want to track:
+#   - KPI 4: Work Mix Distribution (what type of work: features, tech debt, etc.)
+#   - KPI 5: Unplanned Work (interrupt work tracking)
+# If you don't need these KPIs, you can disable this entire section or set enabled: false
+labels:
+  # OPTION 1: Global labels (applied to all projects)
+  # Use this if all your JIRA projects use the same label taxonomy
+  global:
+    enabled: false  # Set to true if using global labels, false if using space-specific or none
+    work_categories:
+      - label: "feature_dev"
+        name: "Feature Development"
+        description: "Product / feature development"
+      - label: "tech_debt"
+        name: "Technical Debt"
+        description: "Refactors, cleanup, stability work"
+      - label: "reliability_perf"
+        name: "Reliability & Performance"
+        description: "Scale, performance, DR, resiliency"
+      - label: "ops_enablement"
+        name: "Ops Enablement"
+        description: "Docs, follow-ups, enablement, migrations"
+      - label: "unplanned"
+        name: "Unplanned Work"
+        description: "Interrupt / ad-hoc work"
+
+  # OPTION 2: Space/Project-specific labels
+  # Use this if different JIRA spaces have different label taxonomies
+  # When a project is queried, it will use its space-specific labels if defined,
+  # otherwise falls back to global labels
+  spaces:
+    # Example: Platform Engineering space
+    - name: "Platform Engineering"
+      projects: ["PLATFORM", "PLATFORM-API"]
+      work_categories:
+        - label: "feature"
+          name: "Feature Work"
+          description: "New features and capabilities"
+        - label: "tech-debt"
+          name: "Technical Debt"
+          description: "Code quality and refactoring"
+        - label: "performance"
+          name: "Performance"
+          description: "Performance improvements"
+        - label: "ops"
+          name: "Operations"
+          description: "Operational work"
+        - label: "interrupt"
+          name: "Interrupt"
+          description: "Unplanned interrupt work"
+
+    # Example: Infrastructure space
+    - name: "Infrastructure"
+      projects: ["INFRA", "CLOUD"]
+      work_categories:
+        - label: "infra-feature"
+          name: "Infrastructure Feature"
+          description: "New infrastructure capabilities"
+        - label: "infra-maintenance"
+          name: "Maintenance"
+          description: "Infrastructure maintenance"
+        - label: "security"
+          name: "Security"
+          description: "Security improvements"
+        - label: "compliance"
+          name: "Compliance"
+          description: "Compliance work"
+        - label: "incident"
+          name: "Incident"
+          description: "Incident response"
+
+    # Example: DevOps space
+    - name: "DevOps"
+      projects: ["DEVOPS"]
+      work_categories:
+        - label: "automation"
+          name: "Automation"
+          description: "Pipeline and automation work"
+        - label: "tooling"
+          name: "Tooling"
+          description: "Developer tooling"
+        - label: "monitoring"
+          name: "Monitoring"
+          description: "Monitoring and observability"
+        - label: "support"
+          name: "Support"
+          description: "Developer support"
+        - label: "urgent"
+          name: "Urgent"
+          description: "Urgent unplanned work"
+
+# KPI Configuration
+kpis:
+  # Time periods for analysis
+  analysis_periods:
+    sprint_lookback: 3          # Number of closed sprints to analyze
+    rolling_days: [30, 60, 90]  # Rolling period in days for trends
+
+  # KPI 1: Sprint Predictability
+  sprint_predictability:
+    enabled: true
+    threshold_warning: 70  # % - Warn if below this
+    threshold_critical: 50 # % - Critical if below this
+
+  # KPI 2: Story Spillover
+  story_spillover:
+    enabled: true
+    max_sprints: 2         # Stories spanning more than this are flagged
+    threshold_warning: 20  # % - Warn if above this
+
+  # KPI 3: Average Story Cycle Time
+  cycle_time:
+    enabled: true
+    threshold_warning: 10  # Days - Warn if above this
+    threshold_critical: 20 # Days - Critical if above this
+
+  # KPI 4: Work Mix Distribution
+  work_mix:
+    enabled: true
+    # Expected healthy ranges (optional - for visualization reference)
+    expected_ranges:
+      feature_dev: [40, 60]
+      tech_debt: [15, 25]
+      reliability_perf: [10, 20]
+      ops_enablement: [5, 15]
+      unplanned: [0, 10]
+
+  # KPI 5: Unplanned Work Load
+  unplanned_work:
+    enabled: true
+    threshold_warning: 20  # % - Warn if above this
+    threshold_critical: 30 # % - Critical if above this
+
+  # KPI 6: Reopened Stories
+  reopened_stories:
+    enabled: true
+    threshold_warning: 10  # % - Warn if above this
+    threshold_critical: 20 # % - Critical if above this
+
+# Dashboard Settings
+dashboard:
+  title: "Platform Engineering KPI Dashboard"
+  port: 8050
+  host: "127.0.0.1"  # localhost only (leadership-only access)
+  debug: false
+
+  # Refresh settings
+  auto_refresh: false
+  refresh_interval_minutes: 60
+
+  # Export settings
+  export_enabled: true
+  export_path: "./data/exports"
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: "./logs/kpi_dashboard.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# Cache Settings (to reduce API calls)
+cache:
+  enabled: true
+  ttl_minutes: 30  # Cache data for 30 minutes
+  cache_dir: "./data/cache"

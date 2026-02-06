@@ -1,0 +1,29 @@
+# Platform Engineering KPI Dashboard - Python Dependencies
+
+# Core Dependencies
+requests==2.31.0
+pyyaml==6.0.1
+python-dotenv==1.0.0
+
+# Dashboard & Visualization
+dash==2.14.2
+dash-bootstrap-components==1.5.0
+plotly==5.18.0
+
+# Data Processing
+pandas==2.2.1
+numpy==1.26.2
+
+# Utilities
+python-dateutil==2.8.2
+tqdm==4.66.1
+
+# Optional: For advanced caching
+# redis==5.0.1
+
+# Development Dependencies (optional)
+# pytest==7.4.3
+# pytest-cov==4.1.0
+# black==23.12.1
+# flake8==6.1.0
+# mypy==1.7.1

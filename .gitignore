@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Environment Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Data & Cache
+data/cache/
+data/exports/*.json
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+
+# JIRA Credentials (important!)
+# Note: config.yaml contains placeholders and can be committed
+# Real credentials should be in .env (which is ignored)
+
+# Test Coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Distribution
+*.egg-info/
+dist/
+build/
+
+# Backup files
+*.bak
+*.backup
+*~
