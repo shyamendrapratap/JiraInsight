@@ -574,13 +574,6 @@ Use cron (Linux/Mac) or Task Scheduler (Windows) to collect data regularly:
 0 9 * * * cd /path/to/project && /path/to/venv/bin/python src/main.py --collect-only --output data/daily_$(date +\%Y\%m\%d).json
 ```
 
-## 📞 Support & Feedback
-
-For issues, questions, or feature requests:
-1. Check logs: `logs/kpi_dashboard.log`
-2. Review configuration: `config/config.yaml`
-3. Test connection: `python src/main.py --test-connection`
-
 ## 📜 License
 
 This project is provided as-is for internal use.
