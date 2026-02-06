@@ -217,8 +217,13 @@ class KPICalculatorDB:
                 if rows:
                     sprint_data = []
                     total_rate = 0
+                    has_valid_data = False
 
                     for row in rows:
+                        # Check if this sprint has meaningful data
+                        if row['committed_count'] > 0 or row['completed_count'] > 0:
+                            has_valid_data = True
+
                         sprint_data.append({
                             "sprint_name": row['sprint_name'],
                             "project": row['project'],
@@ -228,14 +233,20 @@ class KPICalculatorDB:
                         })
                         total_rate += row['completion_rate']
 
-                    overall_average = round(total_rate / len(sprint_data), 1) if sprint_data else 0
+                    # If all sprints show 0/0 (Kanban teams), fall back to alternative calculation
+                    if not has_valid_data:
+                        self.logger.info("Sprint reports show 0/0 - using alternative calculation for Kanban teams")
+                    else:
+                        overall_average = round(total_rate / len(sprint_data), 1) if sprint_data else 0
 
-                    return {
-                        "overall_average": overall_average,
-                        "sprints": sprint_data
-                    }
+                        return {
+                            "overall_average": overall_average,
+                            "sprints": sprint_data
+                        }
 
-        # Fallback to old method (counting issues in closed sprints)
+        # Fallback method: Calculate from closed sprints using issues completed during sprint timeframe
+        from datetime import datetime
+
         sprints = self.db.get_sprints(state="closed")
 
         # Get the most recent N sprints
@@ -244,16 +255,29 @@ class KPICalculatorDB:
 
         sprint_data = []
         total_rate = 0
+        all_issues = self.db.get_issues()
 
         for sprint in recent_sprints:
             sprint_id = sprint['id']
+            sprint_start = sprint.get('start_date', '')
+            sprint_end = sprint.get('end_date', '')
 
-            # Get issues that were in this sprint
-            all_issues = self.db.get_issues()
+            # Method 1: Try using sprint_ids first (for Scrum teams)
             sprint_issues = [
                 issue for issue in all_issues
                 if sprint_id in issue.get('sprint_ids', [])
             ]
+
+            # Method 2: If no issues with sprint_ids, use issues completed during sprint timeframe (for Kanban teams)
+            if not sprint_issues and sprint_start and sprint_end:
+                self.logger.info(f"No issues with sprint_id {sprint_id}, using timeframe-based calculation")
+                sprint_issues = [
+                    issue for issue in all_issues
+                    if issue.get('resolved')
+                    and sprint_start <= issue['resolved'] <= sprint_end
+                    and issue['status'] in ['Done', 'Closed', 'Resolved']
+                    and issue['issue_type'] in ['Story', 'Task', 'Bug']
+                ]
 
             # Count committed (all issues in sprint) vs completed (Done status)
             committed = len(sprint_issues)
