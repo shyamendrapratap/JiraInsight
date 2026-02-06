@@ -576,7 +576,7 @@ Use cron (Linux/Mac) or Task Scheduler (Windows) to collect data regularly:
 
 ## 📜 License
 
-This project is provided as-is for internal use.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🙏 Final Recommendation
 
